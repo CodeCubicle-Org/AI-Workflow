@@ -4,7 +4,7 @@ Materials for the **AI Workflow** workshop by [CodeCubicle.ch](https://codecubic
 
 This repository is a **portable SDLC playbook**: reusable **skills** (markdown workflows) that guide an AI assistant from early discovery through implementation and verification. The same skill definitions work across **Cursor**, **OpenAI Codex CLI**, **Claude Code**, and **Google Gemini CLI**—each tool loads shared project instructions and, where supported, discovers individual skills on disk.
 
-Canonical skill definitions live under **`skills/<skill-name>/SKILL.md`**. [AGENTS.md](AGENTS.md) is the shared index: phase order, default file paths, and links to every skill.
+Canonical skill definitions live under **`skills/<skill-name>/SKILL.md`**. [AGENTS.md](AGENTS.md) is the shared index: phase order, default file paths, operating rules, and links to every skill.
 
 ## What is in the repo
 
@@ -13,11 +13,20 @@ Canonical skill definitions live under **`skills/<skill-name>/SKILL.md`**. [AGEN
 | [AGENTS.md](AGENTS.md) | Root instructions for coding agents: artifact locations, SDLC order, and pointers to each skill. **OpenAI Codex CLI** loads this automatically when you work in the repo (plus optional global rules under `~/.codex/`). |
 | [CLAUDE.md](CLAUDE.md) | **Claude Code** entry point; pulls in shared content via `@AGENTS.md` so project rules stay in one place. |
 | [GEMINI.md](GEMINI.md) | **Gemini CLI** entry point; includes `@AGENTS.md`. You can also add `AGENTS.md` to `context.fileName` in Gemini settings for tools that only read that filename. |
-| [docs/architecture.md](docs/architecture.md) | Template for **technical** constraints—stack, boundaries, NFRs. **`implement-story`** and **`check-story-size`** depend on it being accurate for your product. |
-| [docs/testing-guide.md](docs/testing-guide.md) | Template for **how** automated tests are organized and run locally/CI. **`test-story`** must read this before executing or adding tests. |
-| `skills/<name>/SKILL.md` | Source-of-truth instructions per workflow (wishlist → PRD → stories → planning → code → tests). Edit here first. |
+| [docs/architecture.md](docs/architecture.md) | **Technical contract** for implementers: pinned stack (**React 19.2**, **Vite 7.3.x**, **Vitest** latest, **Tailwind CSS** latest, **React Compiler**, **Node.js > 24** for app/CI/tests), repo layout, NFRs, and boundaries. **`implement-story`** and **`check-story-size`** rely on it. |
+| [docs/testing-guide.md](docs/testing-guide.md) | How to run and write tests for that stack (Vitest + Vite `mergeConfig`, RTL, React Compiler–safe assertions, Tailwind-friendly checks). **`test-story`** must read this **before** any test work. It also states that formal **test plans** use a **test-to-feature matrix**, and story **`-test.md`** reports should mirror **TC ↔ feature ↔ AC** when a plan exists. |
+| `skills/<name>/SKILL.md` | Source-of-truth instructions per workflow (wishlist → PRD → stories → test planning → code → tests). Edit here first. |
 | `.cursor/skills/` · `.claude/skills/` | Mirrored copies of `skills/` so **Cursor** and **Claude Code** can list and invoke skills without custom paths. |
-| [scripts/sync-skills.js](scripts/sync-skills.js) | Cross-platform Node script: copies `skills/` into `.cursor/skills` and `.claude/skills`. Run after skill changes, before commit. Requires Node.js **16.7+**. |
+| [scripts/sync-skills.js](scripts/sync-skills.js) | Cross-platform Node script: copies `skills/` into `.cursor/skills` and `.claude/skills`. Run after skill changes, before commit. Requires Node.js **16.7+** (script only; the **application** toolchain in [docs/architecture.md](docs/architecture.md) expects **Node > 24**). |
+
+### Test-to-feature traceability
+
+Planning and execution stay aligned when:
+
+1. **`create-testplan`** (one story per file) copies the story’s **summary** and **acceptance criteria**, derives **feature bullets (F1, F2, …)**, and fills a **required matrix**: each test case **TC-*** maps to a **feature id** and an **AC number**. Detail sections under test types may only reference **TC-ids** from that matrix—no orphan tests.
+2. **`test-story`** maps results back: in **`docs/stories/<slug>-test.md`**, coverage tables include **AC #**, **feature (F#)**, optional **plan TC-id**, and evidence (test file / name). If **`docs/test-plans/<slug>.md`** exists for the story, use its matrix as the checklist.
+
+See the skills **`create-testplan`** and **`test-story`** for full rules and templates.
 
 ### Generated and maintained docs (typical paths)
 
@@ -30,7 +39,7 @@ Skills write or update these unless your team standardizes different locations:
 | PRD review | `docs/prd-validation.md` |
 | Backlog items | `docs/stories/*.md` |
 | Story reviews / sizing / test reports | `docs/stories/<slug>-validation.md`, `-sizing.md`, `-test.md` |
-| QA strategy | `docs/test-plans/<slug>.md` |
+| QA strategy (per story, matrix **TC ↔ feature ↔ AC**) | `docs/test-plans/<slug>.md` |
 
 ## SDLC phases (skills)
 
@@ -44,9 +53,9 @@ Use the sequence below for an end-to-end run, or open a single skill when that i
 | 4 | `create-story` | Splits work into one markdown file per story under `docs/stories/`. |
 | 5 | `validate-story` | Reviews a single story for clarity and testability. |
 | 6 | `check-story-size` | Decides if a story should be split and suggests execution order. |
-| 7 | `create-testplan` | Plans regression, UAT, integration, and other test types → `docs/test-plans/<slug>.md`. |
-| 8 | `implement-story` | Implements one story in code, following `docs/architecture.md`. |
-| 9 | `test-story` | Runs or adds automated tests per `docs/testing-guide.md`; records results. |
+| 7 | `create-testplan` | **One story at a time:** writes `docs/test-plans/<slug>.md` with **mandatory test-to-feature traceability**—features **F***, acceptance criteria, and a **TC-*** matrix (regression, UAT, integration, **contract testing**, etc.). Every planned test links to **feature + AC**; wider release scope only if explicitly requested. |
+| 8 | `implement-story` | Implements one story in code, following **`docs/architecture.md`**. |
+| 9 | `test-story` | Reads **`docs/testing-guide.md`** first; runs or adds tests; writes **`docs/stories/<slug>-test.md`** with **AC / feature / TC-id** coverage aligned to the story (and to **`docs/test-plans/`** when present). |
 
 ## How to use the skills
 

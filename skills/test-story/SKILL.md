@@ -18,7 +18,7 @@ Provide **evidence** that **`docs/stories/<slug>.md`** acceptance criteria are m
 - **`docs/testing-guide.md`** — **read fully before any test mapping, commands, or new tests**; follow its paths, commands, and conventions unless the user explicitly overrides them for this session.
 - **Story file:** `docs/stories/<slug>.md`
 - **`docs/architecture.md`** — optional; use when tests touch boundaries, NFRs, or integration points described there.
-- **`docs/test-plans/<slug>.md`** — optional; if the story links to a plan or one clearly matches this scope, align **unit / integration / regression** expectations with that document.
+- **`docs/test-plans/<slug>.md`** — optional but recommended; when present, use its **test-to-feature matrix** (**TC-*** ↔ **Feature** ↔ **AC**) as the checklist: every automated or manual run should **map results to TC-ids and story ACs** in `docs/stories/<slug>-test.md`. Do not add tests that are not tied to this story’s **features/ACs** unless the user expands scope.
 - **Implementation** from the same branch/session (or user points to PR/commit).
 - **Project test commands** — must match `docs/testing-guide.md` when that file defines them; otherwise discover from README, package scripts, or CI.
 
@@ -27,8 +27,8 @@ Provide **evidence** that **`docs/stories/<slug>.md`** acceptance criteria are m
 1. **Read `docs/testing-guide.md`**  
    Confirm test locations, commands, naming, and mocking rules. If the file is empty or placeholder-only, infer from the repo and **note gaps** in the test report.
 
-2. **Map AC → tests**  
-   For each AC, list **existing** test file(s) that cover it, or mark **gap**.
+2. **Map feature / AC → tests (test-to-feature)**  
+   For each **AC** (and **feature F-*** if a test plan defines them), list **existing** test file(s) and case names that cover it, or mark **gap**. If a **`docs/test-plans/`** file exists for this story, align rows with **TC-ids** from its matrix.
 
 3. **Prefer extending existing suites**  
    Add the smallest tests that fail without the fix and pass with it, consistent with the testing guide.
@@ -49,9 +49,9 @@ Provide **evidence** that **`docs/stories/<slug>.md`** acceptance criteria are m
 ## Commands run
 - …
 
-## AC coverage
-| AC # | Evidence (test name / file) | Status |
-|------|-----------------------------|--------|
+## AC / feature coverage
+| AC # | Feature (F#) | Plan TC-id (if any) | Evidence (test name / file) | Status |
+|------|--------------|---------------------|-----------------------------|--------|
 
 ## Gaps filled
 - …

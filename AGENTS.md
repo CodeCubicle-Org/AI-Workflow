@@ -24,7 +24,7 @@ If the project already uses different paths, follow the repo and say so in chat.
 4. **create-story** — one file per story under `docs/stories/`
 5. **validate-story** — one story at a time → `docs/stories/<slug>-validation.md`
 6. **check-story-size** — split / order → `docs/stories/<slug>-sizing.md` (default)
-7. **create-testplan** — plan regression, UAT, integration, and other test types → `docs/test-plans/<slug>.md` (when formal QA planning is needed)
+7. **create-testplan** — per **one story**, plan tests with **mandatory test-to-feature traceability** (every TC maps to story features + ACs) → `docs/test-plans/<slug>.md` (when formal QA planning is needed; wider scope only if explicitly requested)
 8. **implement-story** — code per story using **`docs/architecture.md`**
 9. **test-story** — run/add tests, fix story-scope failures → `docs/stories/<slug>-test.md`
 
